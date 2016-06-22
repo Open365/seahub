@@ -133,6 +133,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(PROJECT_ROOT, '../../seahub-data/custom/templates'),
+    os.path.join(PROJECT_ROOT, 'media/custom/templates'),
     os.path.join(PROJECT_ROOT, 'seahub/templates'),
 )
 
@@ -329,9 +330,9 @@ CACHES = {
 # rest_framwork
 REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
-        'ping': '600/minute',
-        'anon': '5/minute',
-        'user': '300/minute',
+        'ping': '60000/second',
+        'anon': '50000/second',
+        'user': '30000/second',
     },
 }
 
@@ -413,6 +414,13 @@ LOGGING = {
                 'maxBytes': 1024*1024*10, # 10 MB
                 'formatter':'standard',
         },
+        'access_handler': {
+                'level':'INFO',
+                'class':'logging.handlers.RotatingFileHandler',
+                'filename': os.path.join(LOG_DIR, 'seahub_gunicorn_access.log'),
+                'maxBytes': 1024*1024*10, # 10 MB
+                'formatter':'standard',
+        },
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
@@ -428,6 +436,11 @@ LOGGING = {
         'django.request': {
             'handlers': ['request_handler', 'mail_admins'],
             'level': 'WARN',
+            'propagate': False
+        },
+        'gunicorn.access': {
+            'handlers': ['access_handler'],
+            'level': 'INFO',
             'propagate': False
         },
     }

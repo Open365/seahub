@@ -60,6 +60,7 @@ define([
             'click .file-star': 'starFile',
             'click .dir-link': 'visitDir',
             'click .more-op-icon': 'togglePopup',
+            'click .edit': 'edit',
             'click .share': 'share',
             'click .delete': 'del', // 'delete' is a preserve word
             'click .rename': 'rename',
@@ -162,6 +163,25 @@ define([
             } else {
                 popup.addClass('hide');
             }
+        },
+
+        edit: function() {
+            var desktopBus = window.parent.DesktopBus;
+            var self = this;
+            Common.getExportedLibraryName(this.dir.repo_id, function(err, libraryName) {
+                if (desktopBus && !err) {
+                    var event = {
+                        name: 'eyeosCloud.fileOpened',
+                        //path: this.dir.repo_name + this.dir.path + '/' + this.model.get('obj_name')
+                        path: Common.pathJoin([libraryName, self.dir.path, self.model.get('obj_name')])
+                    };
+                    console.log("sending event to desktop", event);
+                    desktopBus.dispatch(event.name, event);
+                } else {
+                    console.error('No desktopBus present in parent iframe');
+                }
+            });
+            return false;
         },
 
         share: function() {

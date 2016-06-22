@@ -95,6 +95,7 @@ MAX_INT = 2147483647
 PREVIEW_FILEEXT = {
     TEXT: ('ac', 'am', 'bat', 'c', 'cc', 'cmake', 'cpp', 'cs', 'css', 'diff', 'el', 'h', 'html', 'htm', 'java', 'js', 'json', 'less', 'make', 'org', 'php', 'pl', 'properties', 'py', 'rb', 'scala', 'script', 'sh', 'sql', 'txt', 'text', 'tex', 'vi', 'vim', 'xhtml', 'xml', 'log', 'csv', 'groovy', 'rst', 'patch', 'go'),
     IMAGE: ('gif', 'jpeg', 'jpg', 'png', 'ico', 'bmp'),
+    GIMP: ('avi', 'cel', 'fits', 'fli', 'hrz', 'miff', 'pcx', 'pix', 'pnm', 'ps', 'sgi', 'sunras', 'tga', 'tiff', 'xbm', 'xcf', 'xwd', 'xpm'),
     DOCUMENT: ('doc', 'docx', 'ppt', 'pptx'),
     SPREADSHEET: ('xls', 'xlsx', 'ods', 'fods'),
     # SVG: ('svg',),
@@ -431,8 +432,15 @@ def gen_file_get_url(token, filename):
     """
     return '%s/files/%s/%s' % (get_fileserver_root(), token, urlquote(filename))
 
-def gen_file_upload_url(token, op):
-    return '%s/%s/%s' % (get_fileserver_root(), op, token)
+def gen_file_upload_url(token, op, hostname=None):
+    url = '%s/%s/%s' % (get_fileserver_root(), op, token)
+    if hostname:
+        parsed_url = urlparse(url)
+        if parsed_url.port:
+            hostname += ':' + str(parsed_url.port)
+        parsed_url = parsed_url._replace(netloc=hostname)
+        url = parsed_url.geturl()
+    return url
 
 def get_ccnet_server_addr_port():
     """get ccnet server host and port"""

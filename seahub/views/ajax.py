@@ -57,7 +57,7 @@ from seahub.utils.repo import get_sub_repo_abbrev_origin_path
 from seahub.utils.star import star_file, unstar_file, get_dir_starred_files
 from seahub.base.accounts import User
 from seahub.thumbnail.utils import get_thumbnail_src
-from seahub.utils.file_types import IMAGE
+from seahub.utils.file_types import IMAGE, GIMP
 from seahub.base.templatetags.seahub_tags import translate_seahub_time, \
         file_icon_filter, email2nickname, tsstr_sec
 from seahub.avatar.templatetags.group_avatar_tags import grp_avatar
@@ -358,6 +358,8 @@ def list_lib_dir(request, repo_id):
         f_['perm'] = f.permission # perm for file in current dir
 
         file_type, file_ext = get_file_type_and_ext(f.obj_name)
+        if file_type == GIMP or file_type == IMAGE:
+            f_['is_gimp_editable'] = True
         if file_type == IMAGE:
             f_['is_img'] = True
             if not repo.encrypted and ENABLE_THUMBNAIL and \
@@ -1689,7 +1691,7 @@ def get_file_op_url(request, repo_id):
                                                         op_type, username,
                                                         use_onetime=False)
 
-    url = gen_file_upload_url(token, op_type + '-aj')
+    url = gen_file_upload_url(token, op_type + '-aj', request.GET.get('hostname'))
 
     return HttpResponse(json.dumps({"url": url}), content_type=content_type)
 
@@ -1719,7 +1721,7 @@ def get_file_upload_url_ul(request, token):
     acc_token = seafile_api.get_fileserver_access_token(repo_id, 'dummy',
                                                         'upload', '',
                                                         use_onetime=False)
-    url = gen_file_upload_url(acc_token, 'upload-aj')
+    url = gen_file_upload_url(acc_token, 'upload-aj', request.GET.get('hostname'))
     return HttpResponse(json.dumps({"url": url}), content_type=content_type)
 
 @login_required_ajax

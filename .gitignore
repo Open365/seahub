@@ -19,7 +19,6 @@ pylintrc
 .DS_Store
 *.mo
 media/CACHE
-media/custom
 media/avatars/*
 !media/avatars/default-non-register.jpg
 !media/avatars/default.png
@@ -36,3 +35,4 @@ docs/_build/*
 deps
 ghostdriver.log
 seahub/thumbnail/thumb/*
+.idea/
